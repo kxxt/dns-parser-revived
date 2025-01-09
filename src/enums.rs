@@ -51,7 +51,7 @@ pub enum Type {
 ///
 /// All "EXPERIMENTAL" markers here are from the RFC
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum QueryType {
     /// a host addresss
     A = a::Record::TYPE,
@@ -152,6 +152,45 @@ quick_error! {
         NotImplemented
         Refused
         Reserved(code: u8)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl serde::Serialize for ResponseCode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            ResponseCode::NoError => serializer.serialize_str("NoError"),
+            ResponseCode::FormatError => serializer.serialize_str("FormatError"),
+            ResponseCode::ServerFailure => serializer.serialize_str("ServerFailure"),
+            ResponseCode::NameError => serializer.serialize_str("NameError"),
+            ResponseCode::NotImplemented => serializer.serialize_str("NotImplemented"),
+            ResponseCode::Refused => serializer.serialize_str("Refused"),
+            ResponseCode::Reserved(r) => {
+                let mut s = [b'R', b'e', b's', b'e', b'r', b'v', b'e', b'd', 0, 0, 0];
+                s[8] = (*r / 100) + b'0';
+                s[9] = (*r / 10) % 10 + b'0';
+                s[10] = (*r % 10) + b'0';
+                serializer.serialize_str(unsafe { std::str::from_utf8_unchecked(s.as_slice()) })
+            }
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl serde::Serialize for Opcode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Opcode::StandardQuery => serializer.serialize_str("StandardQuery"),
+            Opcode::InverseQuery => serializer.serialize_str("InverseQuery"),
+            Opcode::ServerStatusRequest => serializer.serialize_str("ServerStatusRequest"),
+            Opcode::Reserved(_) => serializer.serialize_str("Reserved"),
+        }
     }
 }
 

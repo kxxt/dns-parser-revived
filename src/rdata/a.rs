@@ -4,6 +4,7 @@ use crate::Error;
 use byteorder::{BigEndian, ByteOrder};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Record(pub Ipv4Addr);
 
 impl<'a> super::Record<'a> for Record {
