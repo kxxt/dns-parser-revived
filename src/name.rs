@@ -55,7 +55,7 @@ impl<'a> Name<'a> {
                 // Set value for return_pos which is the pos in the original
                 // data buffer that should be used to return after validating
                 // the offsetted labels.
-                if let None = return_pos {
+                if return_pos.is_none() {
                     return_pos = Some(pos);
                 }
 
@@ -85,15 +85,15 @@ impl<'a> Name<'a> {
             byte = parse_data[pos];
         }
         if let Some(return_pos) = return_pos {
-            return Ok(Name {
+            Ok(Name {
                 labels: &data[..return_pos + 2],
-                original: original,
-            });
+                original,
+            })
         } else {
-            return Ok(Name {
+            Ok(Name {
                 labels: &data[..pos + 1],
-                original: original,
-            });
+                original,
+            })
         }
     }
     /// Number of bytes serialized name occupies
@@ -102,7 +102,7 @@ impl<'a> Name<'a> {
     }
 }
 
-impl<'a> fmt::Display for Name<'a> {
+impl fmt::Display for Name<'_> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         let data = self.labels;
         let original = self.original;
@@ -132,7 +132,7 @@ impl<'a> fmt::Display for Name<'a> {
         }
     }
 }
-impl<'a> fmt::Debug for Name<'a> {
+impl fmt::Debug for Name<'_> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.debug_tuple("Name").field(&format!("{}", self)).finish()
     }

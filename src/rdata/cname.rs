@@ -3,7 +3,7 @@ use crate::Name;
 #[derive(Debug, Clone, Copy)]
 pub struct Record<'a>(pub Name<'a>);
 
-impl<'a> ToString for Record<'a> {
+impl ToString for Record<'_> {
     #[inline]
     fn to_string(&self) -> String {
         self.0.to_string()
@@ -80,13 +80,11 @@ mod test {
             ref x => panic!("Wrong rdata {:?}", x),
         }
 
-        let ips = vec![
-            Ipv4Addr::new(104, 16, 103, 204),
+        let ips = [Ipv4Addr::new(104, 16, 103, 204),
             Ipv4Addr::new(104, 16, 107, 204),
             Ipv4Addr::new(104, 16, 104, 204),
             Ipv4Addr::new(104, 16, 106, 204),
-            Ipv4Addr::new(104, 16, 105, 204),
-        ];
+            Ipv4Addr::new(104, 16, 105, 204)];
         for i in 1..6 {
             assert_eq!(&packet.answers[i].name.to_string()[..], "sstatic.net");
             assert_eq!(packet.answers[i].cls, C::IN);

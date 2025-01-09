@@ -8,7 +8,7 @@ use crate::{Error, Header, Name, Packet, QueryClass, QueryType, Question};
 
 const OPT_RR_START: [u8; 3] = [0, 0, 41];
 
-impl<'a> Packet<'a> {
+impl Packet<'_> {
     /// Parse a full DNS Packet and return a structure that has all the
     /// data borrowed from the passed buffer.
     pub fn parse(data: &[u8]) -> Result<Packet, Error> {
@@ -30,9 +30,9 @@ impl<'a> Packet<'a> {
 
             questions.push(Question {
                 qname: name,
-                qtype: qtype,
-                prefer_unicast: prefer_unicast,
-                qclass: qclass,
+                qtype,
+                prefer_unicast,
+                qclass,
             });
         }
         let mut answers = Vec::with_capacity(header.answers as usize);
@@ -57,12 +57,12 @@ impl<'a> Packet<'a> {
             }
         }
         Ok(Packet {
-            header: header,
-            questions: questions,
-            answers: answers,
-            nameservers: nameservers,
-            additional: additional,
-            opt: opt,
+            header,
+            questions,
+            answers,
+            nameservers,
+            additional,
+            opt,
         })
     }
 }
@@ -110,11 +110,11 @@ fn parse_record<'a>(data: &'a [u8], offset: &mut usize) -> Result<ResourceRecord
     let data = RData::parse(typ, &data[*offset..*offset + rdlen], data)?;
     *offset += rdlen;
     Ok(ResourceRecord {
-        name: name,
-        multicast_unique: multicast_unique,
-        cls: cls,
-        ttl: ttl,
-        data: data,
+        name,
+        multicast_unique,
+        cls,
+        ttl,
+        data,
     })
 }
 
@@ -146,11 +146,11 @@ fn parse_opt_record<'a>(data: &'a [u8], offset: &mut usize) -> Result<Opt<'a>, E
     *offset += rdlen;
 
     Ok(Opt {
-        udp: udp,
-        extrcode: extrcode,
-        version: version,
-        flags: flags,
-        data: data,
+        udp,
+        extrcode,
+        version,
+        flags,
+        data,
     })
 }
 
@@ -229,7 +229,7 @@ mod test {
         assert_eq!(&packet.questions[0].qname.to_string()[..], "example.com");
         assert_eq!(packet.answers.len(), 1);
         assert_eq!(&packet.answers[0].name.to_string()[..], "example.com");
-        assert_eq!(packet.answers[0].multicast_unique, false);
+        assert!(!packet.answers[0].multicast_unique);
         assert_eq!(packet.answers[0].cls, C::IN);
         assert_eq!(packet.answers[0].ttl, 1272);
         match packet.answers[0].data {
@@ -249,7 +249,7 @@ mod test {
         let packet = Packet::parse(response).unwrap();
 
         assert_eq!(packet.answers.len(), 1);
-        assert_eq!(packet.answers[0].multicast_unique, true);
+        assert!(packet.answers[0].multicast_unique);
         assert_eq!(packet.answers[0].cls, C::IN);
     }
 
@@ -362,14 +362,12 @@ mod test {
         assert_eq!(packet.questions[0].qclass, QC::IN);
         assert_eq!(&packet.questions[0].qname.to_string()[..], "google.com");
         assert_eq!(packet.answers.len(), 6);
-        let ips = vec![
-            Ipv4Addr::new(64, 233, 164, 100),
+        let ips = [Ipv4Addr::new(64, 233, 164, 100),
             Ipv4Addr::new(64, 233, 164, 139),
             Ipv4Addr::new(64, 233, 164, 113),
             Ipv4Addr::new(64, 233, 164, 102),
             Ipv4Addr::new(64, 233, 164, 101),
-            Ipv4Addr::new(64, 233, 164, 138),
-        ];
+            Ipv4Addr::new(64, 233, 164, 138)];
         for i in 0..6 {
             assert_eq!(&packet.answers[i].name.to_string()[..], "google.com");
             assert_eq!(packet.answers[i].cls, C::IN);
@@ -410,7 +408,7 @@ mod test {
         assert_eq!(packet.questions.len(), 1);
         assert_eq!(packet.questions[0].qtype, QT::SRV);
         assert_eq!(packet.questions[0].qclass, QC::IN);
-        assert_eq!(packet.questions[0].prefer_unicast, false);
+        assert!(!packet.questions[0].prefer_unicast);
         assert_eq!(
             &packet.questions[0].qname.to_string()[..],
             "_xmpp-server._tcp.gmail.com"
@@ -427,7 +425,7 @@ mod test {
         assert_eq!(packet.questions.len(), 1);
         assert_eq!(packet.questions[0].qtype, QT::A);
         assert_eq!(packet.questions[0].qclass, QC::IN);
-        assert_eq!(packet.questions[0].prefer_unicast, true);
+        assert!(packet.questions[0].prefer_unicast);
     }
 
     #[test]

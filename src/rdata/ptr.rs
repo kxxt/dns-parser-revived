@@ -3,7 +3,7 @@ use crate::Name;
 #[derive(Debug, Clone, Copy)]
 pub struct Record<'a>(pub Name<'a>);
 
-impl<'a> ToString for Record<'a> {
+impl ToString for Record<'_> {
     #[inline]
     fn to_string(&self) -> String {
         self.0.to_string()

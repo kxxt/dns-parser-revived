@@ -167,10 +167,10 @@ impl From<u16> for Opcode {
         }
     }
 }
-impl Into<u16> for Opcode {
-    fn into(self) -> u16 {
+impl From<Opcode> for u16 {
+    fn from(val: Opcode) -> Self {
         use self::Opcode::*;
-        match self {
+        match val {
             StandardQuery => 0,
             InverseQuery => 1,
             ServerStatusRequest => 2,
@@ -194,10 +194,10 @@ impl From<u8> for ResponseCode {
         }
     }
 }
-impl Into<u8> for ResponseCode {
-    fn into(self) -> u8 {
+impl From<ResponseCode> for u8 {
+    fn from(val: ResponseCode) -> Self {
         use self::ResponseCode::*;
-        match self {
+        match val {
             NoError         => 0,
             FormatError     => 1,
             ServerFailure   => 2,

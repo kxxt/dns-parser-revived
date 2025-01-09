@@ -28,7 +28,7 @@ impl<'a> super::Record<'a> for Record<'a> {
         }
         let record = Record {
             primary_ns: primary_name_server,
-            mailbox: mailbox,
+            mailbox,
             serial: BigEndian::read_u32(&rdata[pos..(pos+4)]),
             refresh: BigEndian::read_u32(&rdata[(pos+4)..(pos+8)]),
             retry: BigEndian::read_u32(&rdata[(pos+8)..(pos+12)]),
@@ -83,7 +83,7 @@ mod test {
           assert_eq!(packet.nameservers.len(), 1);
           assert_eq!(&packet.nameservers[0].name.to_string()[..], "youtube.com");
           assert_eq!(packet.nameservers[0].cls, C::IN);
-          assert_eq!(packet.nameservers[0].multicast_unique, false);
+          assert!(!packet.nameservers[0].multicast_unique);
           assert_eq!(packet.nameservers[0].ttl, 10800);
           match packet.nameservers[0].data {
               RData::SOA(ref soa_rec) => {

@@ -76,19 +76,17 @@ mod test {
         assert_eq!(&packet.questions[0].qname.to_string()[..],
             "_xmpp-server._tcp.gmail.com");
         assert_eq!(packet.answers.len(), 5);
-        let items = vec![
-            (5, 0, 5269, "xmpp-server.l.google.com"),
+        let items = [(5, 0, 5269, "xmpp-server.l.google.com"),
             (20, 0, 5269, "alt3.xmpp-server.l.google.com"),
             (20, 0, 5269, "alt1.xmpp-server.l.google.com"),
             (20, 0, 5269, "alt2.xmpp-server.l.google.com"),
-            (20, 0, 5269, "alt4.xmpp-server.l.google.com"),
-        ];
+            (20, 0, 5269, "alt4.xmpp-server.l.google.com")];
         for i in 0..5 {
             assert_eq!(&packet.answers[i].name.to_string()[..],
                 "_xmpp-server._tcp.gmail.com");
             assert_eq!(packet.answers[i].cls, C::IN);
             assert_eq!(packet.answers[i].ttl, 900);
-            match *&packet.answers[i].data {
+            match packet.answers[i].data {
                 RData::SRV(Record { priority, weight, port, target }) => {
                     assert_eq!(priority, items[i].0);
                     assert_eq!(weight, items[i].1);
