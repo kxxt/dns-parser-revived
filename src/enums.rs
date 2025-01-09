@@ -1,6 +1,6 @@
-use {Error};
-use rdata::Record;
-use rdata::*;
+use crate::{Error};
+use crate::rdata::Record;
+use crate::rdata::*;
 
 /// The TYPE value according to RFC 1035
 ///
@@ -189,7 +189,7 @@ impl From<u8> for ResponseCode {
             3       => NameError,
             4       => NotImplemented,
             5       => Refused,
-            6...15  => Reserved(code),
+            6..15  => Reserved(code),
             x       => panic!("Invalid response code {}", x),
         }
     }

@@ -1,5 +1,3 @@
-extern crate dns_parser;
-
 use std::env;
 use std::error::Error;
 use std::io::{Read, Write};
@@ -7,9 +5,9 @@ use std::net::TcpStream;
 use std::process;
 
 
-use dns_parser::{Builder, Packet, RData, ResponseCode};
-use dns_parser::rdata::a::Record;
-use dns_parser::{QueryType, QueryClass};
+use dns_parser_revived::{Builder, Packet, RData, ResponseCode};
+use dns_parser_revived::rdata::a::Record;
+use dns_parser_revived::{QueryType, QueryClass};
 
 
 fn main() {
@@ -26,7 +24,7 @@ fn main() {
     process::exit(code);
 }
 
-fn resolve(name: &str) -> Result<(), Box<Error>> {
+fn resolve(name: &str) -> Result<(), Box<dyn Error>> {
     let mut conn = TcpStream::connect("127.0.0.1:53")?;
     let mut builder = Builder::new_query(1, true);
     builder.add_question(name, false, QueryType::A, QueryClass::IN);
