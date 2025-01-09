@@ -73,15 +73,15 @@ mod test {
             (40, "alt4.gmail-smtp-in.l.google.com"),
             (20, "alt2.gmail-smtp-in.l.google.com"),
             (30, "alt3.gmail-smtp-in.l.google.com")];
-        for i in 0..5 {
+        for (i, item) in items.iter().enumerate() {
             assert_eq!(&packet.answers[i].name.to_string()[..],
             "gmail.com");
             assert_eq!(packet.answers[i].cls, C::IN);
             assert_eq!(packet.answers[i].ttl, 1148);
             match packet.answers[i].data {
                 RData::MX( Record { preference, exchange }) => {
-                    assert_eq!(preference, items[i].0);
-                    assert_eq!(exchange.to_string(), (items[i].1).to_string());
+                    assert_eq!(preference, item.0);
+                    assert_eq!(exchange.to_string(), (item.1).to_string());
                 }
                 ref x => panic!("Wrong rdata {:?}", x),
             }

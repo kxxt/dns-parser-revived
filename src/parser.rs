@@ -1,5 +1,3 @@
-use std::i32;
-
 use byteorder::{BigEndian, ByteOrder};
 
 use crate::rdata::opt::Record as Opt;
@@ -368,13 +366,13 @@ mod test {
             Ipv4Addr::new(64, 233, 164, 102),
             Ipv4Addr::new(64, 233, 164, 101),
             Ipv4Addr::new(64, 233, 164, 138)];
-        for i in 0..6 {
+        for (i, ip) in ips.iter().enumerate() {
             assert_eq!(&packet.answers[i].name.to_string()[..], "google.com");
             assert_eq!(packet.answers[i].cls, C::IN);
             assert_eq!(packet.answers[i].ttl, 239);
             match packet.answers[i].data {
                 RData::A(addr) => {
-                    assert_eq!(addr.0, ips[i]);
+                    assert_eq!(addr.0, *ip);
                 }
                 ref x => panic!("Wrong rdata {:?}", x),
             }

@@ -81,17 +81,17 @@ mod test {
             (20, 0, 5269, "alt1.xmpp-server.l.google.com"),
             (20, 0, 5269, "alt2.xmpp-server.l.google.com"),
             (20, 0, 5269, "alt4.xmpp-server.l.google.com")];
-        for i in 0..5 {
+        for (i, item) in items.iter().enumerate() {
             assert_eq!(&packet.answers[i].name.to_string()[..],
                 "_xmpp-server._tcp.gmail.com");
             assert_eq!(packet.answers[i].cls, C::IN);
             assert_eq!(packet.answers[i].ttl, 900);
             match packet.answers[i].data {
                 RData::SRV(Record { priority, weight, port, target }) => {
-                    assert_eq!(priority, items[i].0);
-                    assert_eq!(weight, items[i].1);
-                    assert_eq!(port, items[i].2);
-                    assert_eq!(target.to_string(), (items[i].3).to_string());
+                    assert_eq!(priority, item.0);
+                    assert_eq!(weight, item.1);
+                    assert_eq!(port, item.2);
+                    assert_eq!(target.to_string(), (item.3).to_string());
                 }
                 ref x => panic!("Wrong rdata {:?}", x),
             }

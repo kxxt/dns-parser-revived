@@ -1,12 +1,13 @@
+use std::fmt::Display;
+
 use crate::Name;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Record<'a>(pub Name<'a>);
 
-impl ToString for Record<'_> {
-    #[inline]
-    fn to_string(&self) -> String {
-        self.0.to_string()
+impl Display for Record<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }
 
