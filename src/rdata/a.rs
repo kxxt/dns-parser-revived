@@ -7,7 +7,6 @@ use byteorder::{BigEndian, ByteOrder};
 pub struct Record(pub Ipv4Addr);
 
 impl<'a> super::Record<'a> for Record {
-
     const TYPE: isize = 1;
 
     fn parse(rdata: &'a [u8], _original: &'a [u8]) -> super::RDataResult<'a> {

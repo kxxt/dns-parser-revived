@@ -360,12 +360,14 @@ mod test {
         assert_eq!(packet.questions[0].qclass, QC::IN);
         assert_eq!(&packet.questions[0].qname.to_string()[..], "google.com");
         assert_eq!(packet.answers.len(), 6);
-        let ips = [Ipv4Addr::new(64, 233, 164, 100),
+        let ips = [
+            Ipv4Addr::new(64, 233, 164, 100),
             Ipv4Addr::new(64, 233, 164, 139),
             Ipv4Addr::new(64, 233, 164, 113),
             Ipv4Addr::new(64, 233, 164, 102),
             Ipv4Addr::new(64, 233, 164, 101),
-            Ipv4Addr::new(64, 233, 164, 138)];
+            Ipv4Addr::new(64, 233, 164, 138),
+        ];
         for (i, ip) in ips.iter().enumerate() {
             assert_eq!(&packet.answers[i].name.to_string()[..], "google.com");
             assert_eq!(packet.answers[i].cls, C::IN);

@@ -1,4 +1,4 @@
-use crate::{Name, Error};
+use crate::{Error, Name};
 use byteorder::{BigEndian, ByteOrder};
 
 #[derive(Debug, Clone, Copy)]
@@ -8,7 +8,6 @@ pub struct Record<'a> {
 }
 
 impl<'a> super::Record<'a> for Record<'a> {
-
     const TYPE: isize = 15;
 
     fn parse(rdata: &'a [u8], original: &'a [u8]) -> super::RDataResult<'a> {
@@ -26,14 +25,14 @@ impl<'a> super::Record<'a> for Record<'a> {
 #[cfg(test)]
 mod test {
 
-    use crate::{Packet, Header};
-    use crate::Opcode::*;
-    use crate::ResponseCode::NoError;
-    use crate::QueryType as QT;
-    use crate::QueryClass as QC;
-    use crate::Class as C;
-    use crate::RData;
     use super::*;
+    use crate::Class as C;
+    use crate::Opcode::*;
+    use crate::QueryClass as QC;
+    use crate::QueryType as QT;
+    use crate::RData;
+    use crate::ResponseCode::NoError;
+    use crate::{Header, Packet};
 
     #[test]
     fn parse_response() {
@@ -46,40 +45,46 @@ mod test {
             \x00\x04|\x00\t\x00\x14\x04alt2\xc0)\xc0\x0c\x00\x0f\
             \x00\x01\x00\x00\x04|\x00\t\x00\x1e\x04alt3\xc0)";
         let packet = Packet::parse(response).unwrap();
-        assert_eq!(packet.header, Header {
-            id: 58344,
-            query: false,
-            opcode: StandardQuery,
-            authoritative: false,
-            truncated: false,
-            recursion_desired: true,
-            recursion_available: true,
-            authenticated_data: false,
-            checking_disabled: false,
-            response_code: NoError,
-            questions: 1,
-            answers: 5,
-            nameservers: 0,
-            additional: 0,
-        });
+        assert_eq!(
+            packet.header,
+            Header {
+                id: 58344,
+                query: false,
+                opcode: StandardQuery,
+                authoritative: false,
+                truncated: false,
+                recursion_desired: true,
+                recursion_available: true,
+                authenticated_data: false,
+                checking_disabled: false,
+                response_code: NoError,
+                questions: 1,
+                answers: 5,
+                nameservers: 0,
+                additional: 0,
+            }
+        );
         assert_eq!(packet.questions.len(), 1);
         assert_eq!(packet.questions[0].qtype, QT::MX);
         assert_eq!(packet.questions[0].qclass, QC::IN);
-        assert_eq!(&packet.questions[0].qname.to_string()[..],
-        "gmail.com");
+        assert_eq!(&packet.questions[0].qname.to_string()[..], "gmail.com");
         assert_eq!(packet.answers.len(), 5);
-        let items = [( 5, "gmail-smtp-in.l.google.com"),
+        let items = [
+            (5, "gmail-smtp-in.l.google.com"),
             (10, "alt1.gmail-smtp-in.l.google.com"),
             (40, "alt4.gmail-smtp-in.l.google.com"),
             (20, "alt2.gmail-smtp-in.l.google.com"),
-            (30, "alt3.gmail-smtp-in.l.google.com")];
+            (30, "alt3.gmail-smtp-in.l.google.com"),
+        ];
         for (i, item) in items.iter().enumerate() {
-            assert_eq!(&packet.answers[i].name.to_string()[..],
-            "gmail.com");
+            assert_eq!(&packet.answers[i].name.to_string()[..], "gmail.com");
             assert_eq!(packet.answers[i].cls, C::IN);
             assert_eq!(packet.answers[i].ttl, 1148);
             match packet.answers[i].data {
-                RData::MX( Record { preference, exchange }) => {
+                RData::MX(Record {
+                    preference,
+                    exchange,
+                }) => {
                     assert_eq!(preference, item.0);
                     assert_eq!(exchange.to_string(), (item.1).to_string());
                 }

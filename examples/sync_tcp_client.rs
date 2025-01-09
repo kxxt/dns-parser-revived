@@ -4,17 +4,15 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::process;
 
-
-use dns_parser_revived::{Builder, Packet, RData, ResponseCode};
 use dns_parser_revived::rdata::a::Record;
-use dns_parser_revived::{QueryType, QueryClass};
-
+use dns_parser_revived::{Builder, Packet, RData, ResponseCode};
+use dns_parser_revived::{QueryClass, QueryType};
 
 fn main() {
     let mut code = 0;
     for name in env::args().skip(1) {
         match resolve(&name) {
-            Ok(()) => {},
+            Ok(()) => {}
             Err(e) => {
                 eprintln!("Error resolving {:?}: {}", name, e);
                 code = 1;
@@ -29,8 +27,10 @@ fn resolve(name: &str) -> Result<(), Box<dyn Error>> {
     let mut builder = Builder::new_query(1, true);
     builder.add_question(name, false, QueryType::A, QueryClass::IN);
     let packet = builder.build().map_err(|_| "truncated packet")?;
-    let psize = [((packet.len() >> 8) & 0xFF) as u8,
-                 (packet.len() & 0xFF) as u8];
+    let psize = [
+        ((packet.len() >> 8) & 0xFF) as u8,
+        (packet.len() & 0xFF) as u8,
+    ];
     conn.write_all(&psize[..])?;
     conn.write_all(&packet)?;
     let mut buf = vec![0u8; 4096];
@@ -42,7 +42,9 @@ fn resolve(name: &str) -> Result<(), Box<dyn Error>> {
         match conn.read(&mut buf[off..]) {
             Ok(num) => {
                 off += num;
-                if off < 2 { continue; }
+                if off < 2 {
+                    continue;
+                }
                 let bytes = ((buf[0] as usize) << 8) | buf[1] as usize;
                 if off < bytes + 2 {
                     continue;
