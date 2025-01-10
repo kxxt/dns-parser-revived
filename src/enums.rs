@@ -151,7 +151,7 @@ quick_error! {
         NameError
         NotImplemented
         Refused
-        Reserved(code: u8)
+        Unknown(code: u8)
     }
 }
 
@@ -168,11 +168,11 @@ impl serde::Serialize for ResponseCode {
             ResponseCode::NameError => serializer.serialize_str("NameError"),
             ResponseCode::NotImplemented => serializer.serialize_str("NotImplemented"),
             ResponseCode::Refused => serializer.serialize_str("Refused"),
-            ResponseCode::Reserved(r) => {
-                let mut s = [b'R', b'e', b's', b'e', b'r', b'v', b'e', b'd', 0, 0, 0];
-                s[8] = (*r / 100) + b'0';
-                s[9] = (*r / 10) % 10 + b'0';
-                s[10] = (*r % 10) + b'0';
+            ResponseCode::Unknown(r) => {
+                let mut s = [b'U', b'n', b'k', b'n', b'o', b'w', b'n', 0, 0, 0];
+                s[7] = (*r / 100) + b'0';
+                s[8] = (*r / 10) % 10 + b'0';
+                s[9] = (*r % 10) + b'0';
                 serializer.serialize_str(unsafe { std::str::from_utf8_unchecked(s.as_slice()) })
             }
         }
@@ -227,8 +227,7 @@ impl From<u8> for ResponseCode {
             3 => NameError,
             4 => NotImplemented,
             5 => Refused,
-            6..15 => Reserved(code),
-            x => panic!("Invalid response code {}", x),
+            _ => Unknown(code),
         }
     }
 }
@@ -242,7 +241,7 @@ impl From<ResponseCode> for u8 {
             NameError => 3,
             NotImplemented => 4,
             Refused => 5,
-            Reserved(code) => code,
+            Unknown(code) => code,
         }
     }
 }
